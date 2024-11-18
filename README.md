@@ -1,4 +1,6 @@
 Смысл программы: отмечать объекты Мессье на скайчарте(а ещё, видимо, учить их финские названия).
+![image](https://github.com/user-attachments/assets/50775e85-d4d1-497d-9a2c-58765bc80a56)
+
 
 Как поставить на пайчарм: в верхней панели Git - clone - вставляем https://github.com/userOlolowa/pythonProject22 - проект открыт!
 
