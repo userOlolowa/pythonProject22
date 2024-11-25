@@ -218,7 +218,7 @@ image = cv2.imread('ac0.png')
 
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-_, binary = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
+_, binary = cv2.threshold(gray, 300, 255, cv2.THRESH_BINARY_INV)
 
 contours, hierarchy = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -239,7 +239,8 @@ res = np.dstack((result, alpha))
 
 # Save result
 cv2.imwrite('ac0.png', res)
-way0 = np.array(res)
+way = Image.open('ac0.png') #необходимо для нормальных цветов
+way0 = np.array(way)
 #----------------------------------------------------------------
 image = cv2.imread('ac1.png')
 
@@ -266,7 +267,8 @@ res = np.dstack((result, alpha))
 
 # Save result
 cv2.imwrite('ac1.png', res)
-way1 = np.array(res)
+way = Image.open('ac1.png')
+way1 = np.array(way)
 #----------------------------------------------------------------
 image = cv2.imread('ac2.png')
 
@@ -293,7 +295,8 @@ res = np.dstack((result, alpha))
 
 # Save result
 cv2.imwrite('ac2.png', res)
-way2 = np.array(res)
+way = Image.open('ac2.png')
+way2 = np.array(way)
 #----------------------------------------------------------------
 image = cv2.imread('ac3.png')
 
@@ -320,7 +323,8 @@ res = np.dstack((result, alpha))
 
 # Save result
 cv2.imwrite('ac3.png', res)
-way3 = np.array(res)
+way = Image.open('ac3.png')
+way3 = np.array(way)
 #----------------------------------------------------------------
 
 
@@ -689,7 +693,24 @@ class MyPaintWidget(Widget):
         super().__init__(**kwargs)
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
+        my_label = CoreLabel()
+        my_label.text = 'НАЖМИТЕ КНОПКУ R'
+        my_label.refresh()
+        text = my_label.texture
+        with self.canvas:
+            Color(0, 1, 0, 1)  # цвет
 
+            d = 100
+            Rectangle( pos=(1050, 500), size=(25*16, 50), texture=text)
+        my_label = CoreLabel()
+        my_label.text = 'НЕ ТРОГАЙТЕ МЫШКУ'
+        my_label.refresh()
+        text = my_label.texture
+        with self.canvas:
+            Color(1, 0, 0, 1)  # цвет
+
+            d = 100
+            Rectangle( pos=(1050, 400), size=(25*17, 50), texture=text)
 
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down=self._on_keyboard_down)
@@ -800,28 +821,30 @@ class MyPaintWidget(Widget):
             d = 700
             Rectangle(source=ky,pos=(1050, 50), size=(width/height*750, 750))
 
+        print("Загрузка живого горизонта")
+        with alive_bar(p, force_tty=True) as bar:
+            for i in range(p):
+                    with self.canvas:
 
-        for i in range(p):
-                with self.canvas:
 
+                        vec1 = np.array([0,1,0])
+                        vec2 = np.array([ gorizont[i][1]-gorizont[i][3], gorizont[i][2]-gorizont[i][4],0])
+                        if gorizont[i][1]>gorizont[i][3]:
+                            ang = 360 - vg.angle(vec1, vec2)
+                        else:
+                            ang = vg.angle(vec1, vec2)
+                        kivy.graphics.PushMatrix()
+                        self.rotation = Rotate(origin=(gorizont[i][3], gorizont[i][4]),angle=ang)
+                        self.bind(center=lambda _, value: setattr(self.rotation, "origin", value))
 
-                    vec1 = np.array([0,1,0])
-                    vec2 = np.array([ gorizont[i][1]-gorizont[i][3], gorizont[i][2]-gorizont[i][4],0])
-                    if gorizont[i][1]>gorizont[i][3]:
-                        ang = 360 - vg.angle(vec1, vec2)
-                    else:
-                        ang = vg.angle(vec1, vec2)
-                    kivy.graphics.PushMatrix()
-                    self.rotation = Rotate(origin=(gorizont[i][3], gorizont[i][4]),angle=ang)
-                    self.bind(center=lambda _, value: setattr(self.rotation, "origin", value))
+                        im = Image.open(gorizont[i][0])
+                        width, height = im.size
 
-                    im = Image.open(gorizont[i][0])
-                    width, height = im.size
-
-                    Color(1, 1, 1, 1)
-                    dlina = ((gorizont[i][1]-gorizont[i][3])**2 + (gorizont[i][2]-gorizont[i][4])**2)**0.5
-                    Rectangle(source=gorizont[i][0],pos=(gorizont[i][3], gorizont[i][4]), size=(dlina*width/height, dlina))
-                    PopMatrix()
+                        Color(1, 1, 1, 1)
+                        dlina = ((gorizont[i][1]-gorizont[i][3])**2 + (gorizont[i][2]-gorizont[i][4])**2)**0.5
+                        Rectangle(source=gorizont[i][0],pos=(gorizont[i][3], gorizont[i][4]), size=(dlina*width/height, dlina))
+                        PopMatrix()
+                    bar()
 
 
         # for i in range(len(ra2n)):
@@ -836,10 +859,10 @@ class MyPaintWidget(Widget):
 
     def on_touch_down(self, touch):
         global Mx,My,hard,Messier,mk
-        print(touch,self)
+
         #считаем расстояние до мессьешки, рисуем мессьешку, ставим крест с цветом в зависимости от правильности, делаем новую мессьешку
         g = ((Mx - touch.x) ** 2 + (My - touch.y) ** 2)/hard**2
-        print(g)
+        print('Расстояние до объекта Мессье',g)
         with self.canvas:
             Color(g, 1-g, 0, 1)
             d = 8.
