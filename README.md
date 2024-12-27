@@ -20,4 +20,6 @@
 С недавних пор появилась возможность прорисовки горизонта:
 ![image](https://github.com/user-attachments/assets/30dbd718-3e2c-4f49-8bc4-252b48d5fb1c)
 ![image](https://github.com/user-attachments/assets/0286b818-a123-4a8f-a0e6-44e55504dbf1)
+![image](https://github.com/user-attachments/assets/dce16606-3a09-4e5d-8e05-0dfe9e9373b0)
+![Uploading image.png…]()
 
